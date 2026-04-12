@@ -10,9 +10,11 @@ class BudgetItemCreate(BaseModel):
 class BudgetItemResponse(BaseModel):
     id: int
     category_id: int
+    category_name: Optional[str] = None
     limit: float
     spent: float = 0.0
     remaining: float = 0.0
+    percent_used: float = 0.0
 
     class Config:
         from_attributes = True

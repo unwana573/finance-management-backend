@@ -5,7 +5,7 @@ from api.core.database import Base, engine
 from api.routers import (
     auth, users, transactions, budget,
     analytics, settings as settings_router,
-    webhooks, categories,
+    webhooks, categories, oauth,
 )
 
 Base.metadata.create_all(bind=engine)
@@ -26,14 +26,15 @@ app.add_middleware(
 )
 
 PREFIX = "/v1"
-app.include_router(auth.router,              prefix=PREFIX)
-app.include_router(users.router,             prefix=PREFIX)
-app.include_router(transactions.router,      prefix=PREFIX)
-app.include_router(budget.router,            prefix=PREFIX)
-app.include_router(analytics.router,         prefix=PREFIX)
-app.include_router(settings_router.router,   prefix=PREFIX)
-app.include_router(webhooks.router,          prefix=PREFIX)
-app.include_router(categories.router,        prefix=PREFIX)
+app.include_router(auth.router,            prefix=PREFIX)
+app.include_router(oauth.router,           prefix=PREFIX)
+app.include_router(users.router,           prefix=PREFIX)
+app.include_router(transactions.router,    prefix=PREFIX)
+app.include_router(budget.router,          prefix=PREFIX)
+app.include_router(analytics.router,       prefix=PREFIX)
+app.include_router(settings_router.router, prefix=PREFIX)
+app.include_router(webhooks.router,        prefix=PREFIX)
+app.include_router(categories.router,      prefix=PREFIX)
 
 
 @app.get("/health", tags=["Health"])

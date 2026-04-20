@@ -16,21 +16,36 @@ class TransactionType(str, enum.Enum):
 class User(Base):
     __tablename__ = "users"
 
-    id               = Column(Integer, primary_key=True, index=True)
-    email            = Column(String(255), unique=True, index=True, nullable=False)
-    full_name        = Column(String(255), nullable=False)
-    hashed_password  = Column(String(255), nullable=False)
-    currency         = Column(String(10), default="NGN")
-    is_active        = Column(Boolean, default=True)
-    two_fa_enabled   = Column(Boolean, default=False)
-    totp_secret      = Column(String(64), nullable=True)
-    created_at       = Column(DateTime, default=datetime.utcnow)
-    updated_at       = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    id                = Column(Integer, primary_key=True, index=True)
+    email             = Column(String(255), unique=True, index=True, nullable=False)
+    full_name         = Column(String(255), nullable=False)
+    hashed_password   = Column(String(255), nullable=True)
+    currency          = Column(String(10), default="NGN")
+    is_active         = Column(Boolean, default=True)
+    two_fa_enabled    = Column(Boolean, default=False)
+    totp_secret       = Column(String(64), nullable=True)
+    avatar_url        = Column(String(500), nullable=True)
+    created_at        = Column(DateTime, default=datetime.utcnow)
+    updated_at        = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    refresh_tokens   = relationship("RefreshToken", back_populates="user", cascade="all, delete")
-    transactions     = relationship("Transaction", back_populates="user", cascade="all, delete")
-    budgets          = relationship("Budget", back_populates="user", cascade="all, delete")
+    refresh_tokens    = relationship("RefreshToken", back_populates="user", cascade="all, delete")
+    transactions      = relationship("Transaction", back_populates="user", cascade="all, delete")
+    budgets           = relationship("Budget", back_populates="user", cascade="all, delete")
     notification_pref = relationship("NotificationPreference", back_populates="user", uselist=False, cascade="all, delete")
+    oauth_accounts    = relationship("OAuthAccount", back_populates="user", cascade="all, delete")
+
+
+class OAuthAccount(Base):
+    __tablename__ = "oauth_accounts"
+
+    id          = Column(Integer, primary_key=True, index=True)
+    user_id     = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
+    provider    = Column(String(20), nullable=False)
+    provider_id = Column(String(255), nullable=False)
+    avatar_url  = Column(String(500), nullable=True)
+    created_at  = Column(DateTime, default=datetime.utcnow)
+
+    user        = relationship("User", back_populates="oauth_accounts")
 
 
 class RefreshToken(Base):
@@ -103,23 +118,23 @@ class BudgetItem(Base):
 class NotificationPreference(Base):
     __tablename__ = "notification_preferences"
 
-    id                    = Column(Integer, primary_key=True, index=True)
-    user_id               = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
-    budget_alerts         = Column(Boolean, default=True)
-    transaction_alerts    = Column(Boolean, default=True)
-    weekly_digest         = Column(Boolean, default=True)
-    updated_at            = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    id                 = Column(Integer, primary_key=True, index=True)
+    user_id            = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False)
+    budget_alerts      = Column(Boolean, default=True)
+    transaction_alerts = Column(Boolean, default=True)
+    weekly_digest      = Column(Boolean, default=True)
+    updated_at         = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    user                  = relationship("User", back_populates="notification_pref")
+    user               = relationship("User", back_populates="notification_pref")
 
 
 class AuditLog(Base):
     __tablename__ = "audit_logs"
 
-    id          = Column(Integer, primary_key=True, index=True)
-    user_id     = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
-    action      = Column(String(100), nullable=False)
-    entity      = Column(String(100), nullable=True)
-    entity_id   = Column(Integer, nullable=True)
-    detail      = Column(Text, nullable=True)
-    created_at  = Column(DateTime, default=datetime.utcnow)
+    id         = Column(Integer, primary_key=True, index=True)
+    user_id    = Column(Integer, ForeignKey("users.id", ondelete="SET NULL"), nullable=True)
+    action     = Column(String(100), nullable=False)
+    entity     = Column(String(100), nullable=True)
+    entity_id  = Column(Integer, nullable=True)
+    detail     = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)

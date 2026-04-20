@@ -16,6 +16,10 @@ class Settings(BaseSettings):
 
     TOTP_ISSUER: str = "NairaFlow"
 
+    GOOGLE_CLIENT_ID: str = ""
+
+    APPLE_CLIENT_ID: str = ""
+
     SENDGRID_API_KEY: str = ""
     EMAIL_FROM: str = "noreply@nairaflow.com"
 

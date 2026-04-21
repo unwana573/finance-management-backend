@@ -17,6 +17,8 @@ class Settings(BaseSettings):
 
     TOTP_ISSUER: str = "NairaFlow"
 
+    ALLOWED_ORIGINS: list[str] = ["http://localhost:3000"]
+
     GOOGLE_CLIENT_ID: str = ""
     GOOGLE_CLIENT_SECRET: str = ""
 

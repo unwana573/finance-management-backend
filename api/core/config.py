@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     APP_NAME: str = "Finance Management Api"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
+    ENABLE_SEED: bool = False
 
     DATABASE_URL: str = "postgresql://postgres:root@localhost:5432/test-run"
 

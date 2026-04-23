@@ -3,14 +3,13 @@ import secrets
 import jwt
 from passlib.context import CryptContext
 from api.core.config import settings
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 from datetime import datetime, timedelta
 import secrets
 import bcrypt
 import jwt
 from api.core.config import settings
 
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
     return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")

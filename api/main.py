@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter, _rate_limit_exceeded_handler
 from slowapi.util import get_remote_address
@@ -8,7 +8,7 @@ from api.core.database import Base, engine
 from api.routers import (
     auth, users, transactions, budget,
     analytics, settings as settings_router,
-    webhooks, categories, oauth,
+    webhooks, categories, oauth, seed,
 )
 
 Base.metadata.create_all(bind=engine)
@@ -43,6 +43,7 @@ app.include_router(analytics.router,       prefix=PREFIX)
 app.include_router(settings_router.router, prefix=PREFIX)
 app.include_router(webhooks.router,        prefix=PREFIX)
 app.include_router(categories.router,      prefix=PREFIX)
+app.include_router(seed.router,            prefix=PREFIX)
 
 
 @app.get("/health", tags=["Health"])

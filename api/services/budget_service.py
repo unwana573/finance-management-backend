@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 from api.repositories.budget_repo import BudgetRepository, BudgetItemRepository
 from api.models import Transaction, TransactionType, Category
-from api.schemas.budget import BudgetCreate, BudgetUpdate, BudgetResponse, BudgetItemResponse
+from api.schemas.budget import BudgetCreate, BudgetUpdate, BudgetResponse, BudgetItemResponse, BudgetSummaryResponse
 
 
 class BudgetService:
@@ -37,6 +37,49 @@ class BudgetService:
         if not budget:
             raise HTTPException(status_code=404, detail="No budget set for this month")
         return self._build_response(user_id, budget)
+
+    def get_by_month(self, user_id: int, year: int, month: int) -> BudgetResponse:
+        budget = self.budget_repo.get_by_month(user_id, year, month)
+        if not budget:
+            raise HTTPException(status_code=404, detail=f"No budget set for {year}-{month:02d}")
+        return self._build_response(user_id, budget)
+
+    def get_summary(self, user_id: int) -> BudgetSummaryResponse:
+        """
+        Always returns budget summary for the current month.
+        If no budget is set, returns zeros — never 404.
+        Safe to call on page load for new users.
+        """
+        now = datetime.utcnow()
+        budget = self.budget_repo.get_by_month(user_id, now.year, now.month)
+
+        if not budget:
+            return BudgetSummaryResponse(
+                budget_exists=False,
+                month=now.month,
+                year=now.year,
+                total_budget=0.0,
+                total_spent=0.0,
+                remaining=0.0,
+                percent_used=0.0,
+                categories=[],
+            )
+
+        response = self._build_response(user_id, budget)
+        percent_used = round(
+            (response.total_spent / response.total_budget * 100), 1
+        ) if response.total_budget > 0 else 0.0
+
+        return BudgetSummaryResponse(
+            budget_exists=True,
+            month=response.month,
+            year=response.year,
+            total_budget=response.total_budget,
+            total_spent=response.total_spent,
+            remaining=response.remaining,
+            percent_used=percent_used,
+            categories=response.items,
+        )
 
     def create(self, user_id: int, body: BudgetCreate) -> BudgetResponse:
         existing = self.budget_repo.get_by_month(user_id, body.year, body.month)

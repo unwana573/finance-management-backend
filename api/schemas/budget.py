@@ -41,3 +41,20 @@ class BudgetResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+class BudgetSummaryResponse(BaseModel):
+    """
+    Always returns data even if no budget is set.
+    Use this for the Budget page on load.
+    budget_exists = False means user hasn't created a budget yet —
+    show a prompt to create one.
+    """
+    budget_exists: bool
+    month: int
+    year: int
+    total_budget: float
+    total_spent: float
+    remaining: float
+    percent_used: float
+    categories: List[BudgetItemResponse]
